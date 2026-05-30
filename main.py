@@ -48,10 +48,33 @@ Workflow:
 # 4. Generate final report figures
 # 5. Execute integration tests
 # 6. Prepare demo-ready outputs
-
+from utils.data_generator import (
+    generate_population_points,
+    generate_population_weights,
+    save_population_data,
+    load_population_data
+)
 
 def main():
-    pass
+
+    points = generate_population_points()
+    weights = generate_population_weights()
+
+    save_population_data(
+        "population_data.npz",
+        points,
+        weights
+    )
+
+    loaded_points, loaded_weights = load_population_data(
+        "population_data.npz"
+    )
+
+    print("First 5 points:")
+    print(loaded_points[:5])
+
+    print("\nFirst 5 weights:")
+    print(loaded_weights[:5])
 
 
 if __name__ == "__main__":
