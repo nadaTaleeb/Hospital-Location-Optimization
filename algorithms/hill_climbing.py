@@ -85,17 +85,34 @@ def generate_successors(solution):
 
     # We remove one selected hospital and add one unselected hospital.
     # This keeps the number of hospitals the same but changes their locations.
+   # selected_indices = np.where(solution == 1)[0]
+    #unselected_indices = np.where(solution == 0)[0]
+
+    #for selected in selected_indices:
+     #   for unselected in unselected_indices:
+      #      new_solution = solution.copy()
+       #     new_solution[selected] = 0
+        #    new_solution[unselected] = 1
+         #   successors.append(new_solution)
+    #return successors
+        # Swap operator:
+    # We try a limited number of swaps to keep the algorithm fast.
     selected_indices = np.where(solution == 1)[0]
     unselected_indices = np.where(solution == 0)[0]
 
-    for selected in selected_indices:
-        for unselected in unselected_indices:
+    max_swaps = 20
+
+    if len(selected_indices) > 0 and len(unselected_indices) > 0:
+        for _ in range(max_swaps):
+            selected = np.random.choice(selected_indices)
+            unselected = np.random.choice(unselected_indices)
+
             new_solution = solution.copy()
             new_solution[selected] = 0
             new_solution[unselected] = 1
             successors.append(new_solution)
+            
     return successors
-
 
 def random_restart_hill_climbing( population_points, weights, candidate_hospitals, lambd, restart_times=10, max_iterations=500, selection_rate=0.15):
     population_points, weights, candidate_hospitals = validate_inputs( population_points, weights, candidate_hospitals, lambd)
