@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import time
 
 from utils.cost_function import calculate_cost, generate_candidate_hospitals
 from utils.data_generator import generate_population_points, generate_population_weights
@@ -32,9 +33,8 @@ def validate_inputs(population_points, weights, candidate_hospitals, lambd):
 
     return population_points, weights, candidate_hospitals
 
-
 # Generate a random initial solution
-def generate_initial_solution(num_candidates, selection_rate=0.15):
+def generate_initial_solution(num_candidates, selection_rate=0.15,seed=None):
     if num_candidates <= 0:
         raise ValueError("num_candidates must be positive.")
 
@@ -56,7 +56,7 @@ def acceptance_probability(current_cost, new_cost, temperature):
         raise ValueError("temperature must be positive.")
 
     # Better solutions are always accepted
-    if new_cost < current_cost:
+    if new_cost <= current_cost:
         return 1.0
 
     # Worse solutions may be accepted depending on temperature
@@ -64,8 +64,13 @@ def acceptance_probability(current_cost, new_cost, temperature):
 
 
 # Simulated Annealing algorithm
-def simulated_annealing(population_points,weights,candidate_hospitals,lambd,max_iterations=500, initial_temperature=1000, alpha=0.95, selection_rate=0.15):
+#def simulated_annealing(population_points,weights,candidate_hospitals,lambd,max_iterations=500, initial_temperature=1000, alpha=0.95, selection_rate=0.15):
+def simulated_annealing(population_points, weights, candidate_hospitals, lambd,max_iterations=500, initial_temperature=1000,alpha=0.95, selection_rate=0.15, seed=None):
+    if seed is not None:
+        np.random.seed(seed)
+        random.seed(seed)
 
+    start_time = time.time()
     population_points, weights, candidate_hospitals = validate_inputs(population_points, weights, candidate_hospitals, lambd)
     if max_iterations <= 0:
         raise ValueError("max iterations must be positive.")
@@ -78,7 +83,7 @@ def simulated_annealing(population_points,weights,candidate_hospitals,lambd,max_
 
     num_candidates = len(candidate_hospitals)
 
-    current_solution = generate_initial_solution(num_candidates, selection_rate)
+    current_solution = generate_initial_solution(num_candidates, selection_rate , seed)
 
     current_cost = calculate_cost(population_points,weights,candidate_hospitals,current_solution,lambd)
     best_solution = current_solution.copy()
@@ -116,24 +121,6 @@ def simulated_annealing(population_points,weights,candidate_hospitals,lambd,max_
 
         # Decrease temperature gradually
         temperature = temperature * alpha
+    runtime_seconds = time.time() - start_time
 
-    return best_solution, best_cost, cost_curve, temperature_curve
-
-
-if __name__ == "__main__":
-
-    np.random.seed(42)
-    random.seed(42)
-
-    population_points = generate_population_points()
-    weights = generate_population_weights()
-    candidate_hospitals = generate_candidate_hospitals()
-
-    lambd = 10
-
-    best_solution, best_cost, cost_curve, temperature_curve = simulated_annealing(population_points,weights,candidate_hospitals,lambd)
-    print("Best cost:", best_cost)
-    print("Number of selected hospitals:", int(np.sum(best_solution)))
-    print("Selected hospital indices:", np.where(best_solution == 1)[0])
-    print("Expanded states:", len(cost_curve))
-    print("Viewed states:", len(cost_curve))
+    return {"best_solution": best_solution,"total_cost": best_cost,"num_hospitals": int(np.sum(best_solution)),"cost_curve": cost_curve,"temperature_curve": temperature_curve,"runtime_seconds": runtime_seconds,"iterations": len(cost_curve)}
