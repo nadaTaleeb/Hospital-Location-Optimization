@@ -5,12 +5,6 @@
 # - Nada
 # - Mayar
 
-# Workflow:
-# 1. Generate data
-# 2. Run algorithm
-# 3. Collect results
-# 4. Generate plots
-# 5. Save outputs
 import numpy as np
 
 
@@ -77,20 +71,6 @@ def main():
 
     else:
         print("Both algorithms found the same cost.")
-
-
-    # ============================================
-    # Future tasks
-    # ============================================
-    # plot_solution(...)
-    # plot_convergence(...)
-    # plot_lambda_analysis(...)
-
-    # run_hill_climbing_experiments()
-    # run_simulated_annealing_experiments()
-
-    # save_results(...)
-
 
 if __name__ == "__main__":
     main()
