@@ -31,9 +31,12 @@ def test_simulated_annealing_runs():
     weights = np.random.randint(1, 11, size=20)
     candidate_hospitals = np.random.uniform(0, 100, size=(20, 2))
 
-    solution, cost, cost_curve, temperature_curve = simulated_annealing(population_points,weights,candidate_hospitals,lambd=10,max_iterations=50)
+    result = simulated_annealing(population_points, weights, candidate_hospitals,lambd=10, max_iterations=50, seed=42)
 
-    assert solution is not None
-    assert cost >= 0
-    assert len(cost_curve) == 50
-    assert len(temperature_curve) == 50
+    assert result["best_solution"] is not None
+    assert result["total_cost"] >= 0
+    assert len(result["cost_curve"]) == 50
+    assert len(result["temperature_curve"]) == 50
+    assert result["iterations"] == 50
+    assert result["num_hospitals"] >= 1
+    assert result["runtime_seconds"] >= 0

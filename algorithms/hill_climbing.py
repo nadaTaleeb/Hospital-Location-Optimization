@@ -1,4 +1,6 @@
 import numpy as np
+import time
+
 
 def validate_inputs(population_points, weights, candidate_hospitals, lambd):
 
@@ -47,7 +49,7 @@ def calculate_cost(population_points, weights, candidate_hospitals, solution, la
     return total_distance_cost + hospital_building_cost
 
 
-def generate_initial_solution(num_candidates, selection_rate=0.15):
+def generate_initial_solution(num_candidates, selection_rate=0.15 , seed=None):
     if num_candidates <= 0:
         raise ValueError("num_candidates must be greater than 0.")
 
@@ -64,7 +66,7 @@ def generate_initial_solution(num_candidates, selection_rate=0.15):
     return solution
 
 
-def generate_successors(solution):
+def generate_successors(solution, max_swaps=2, seed=None):
     if solution is None:
         raise ValueError("solution cannot be None.")
 
@@ -88,7 +90,6 @@ def generate_successors(solution):
     selected_indices = np.where(solution == 1)[0]
     unselected_indices = np.where(solution == 0)[0]
 
-    max_swaps = 5 ############################# check 
 
     if len(selected_indices) > 0 and len(unselected_indices) > 0:
         for _ in range(max_swaps):
@@ -102,20 +103,22 @@ def generate_successors(solution):
             
     return successors
 
-def random_restart_hill_climbing( population_points, weights, candidate_hospitals, lambd, restart_times=10, max_iterations=500, selection_rate=0.15):
+def random_restart_hill_climbing( population_points, weights, candidate_hospitals, lambd, restart_times=10, max_iterations=500, selection_rate=0.15 ,seed=None):
     population_points, weights, candidate_hospitals = validate_inputs( population_points, weights, candidate_hospitals, lambd)
-
+    if seed is not None:
+        np.random.seed(seed)
     if restart_times < 0:
         raise ValueError("restart times cannot be negative.")
 
     if max_iterations <= 0:
         raise ValueError("max iterations must be greater than 0.")
-
+    start = time.time()
     best_solution = None
     best_cost = float("inf")
 
     total_expanded_states = 0
     total_viewed_states = 0
+    cost_history = [] 
 
     for restart in range(restart_times + 1):
 
@@ -142,15 +145,9 @@ def random_restart_hill_climbing( population_points, weights, candidate_hospital
             current_solution = best_successor.copy()
             current_cost = best_successor_cost
             total_expanded_states += 1
-
+            cost_history.append(current_cost) # record cost at each improvement
         if current_cost < best_cost:
             best_solution = current_solution.copy()
             best_cost = current_cost
-
-    print("Best cost:", best_cost)
-    print("Number of selected hospitals:", int(np.sum(best_solution)))
-    print("Selected hospital indices:", np.where(best_solution == 1)[0])
-    print("Expanded states:", total_expanded_states)
-    print("Viewed states:", total_viewed_states)
-    return best_solution, best_cost
-
+    runtime = round(time.time() - start, 4)
+    return {"best_solution": best_solution,"total_cost": float(best_cost),"num_hospitals": int(np.sum(best_solution)),"hospital_penalty": float(lambd * int(np.sum(best_solution))),"travel_cost": float(best_cost - lambd * int(np.sum(best_solution))),"cost_history": cost_history,"runtime_seconds": runtime,"expanded_states": total_expanded_states,"viewed_states": total_viewed_states}

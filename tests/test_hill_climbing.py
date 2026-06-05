@@ -36,6 +36,12 @@ def test_hill_climbing_runs():  # Check that algorithm runs without errors
     population_points = np.random.uniform(0, 100, size=(20, 2))
     weights = np.random.randint( 1, 11, size=20)
     candidate_hospitals = np.random.uniform(0, 100, size=(20, 2))
-    solution, cost = random_restart_hill_climbing(population_points,weights,candidate_hospitals,lambd=10,restart_times=2)
-    assert solution is not None
-    assert cost >= 0
+    result = random_restart_hill_climbing( population_points, weights, candidate_hospitals, lambd=10, restart_times=2, seed=42)
+
+    assert result["best_solution"] is not None
+    assert result["total_cost"] >= 0
+    assert result["num_hospitals"] >= 1
+    assert result["runtime_seconds"] >= 0
+    assert "cost_history" in result
+    assert "expanded_states" in result
+    assert "viewed_states" in result
