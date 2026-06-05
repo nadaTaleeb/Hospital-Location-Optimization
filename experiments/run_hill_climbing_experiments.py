@@ -1,5 +1,6 @@
 import time
 import numpy as np
+import pandas as pd
 
 from algorithms.hill_climbing import random_restart_hill_climbing
 from utils.data_generator import generate_population_points, generate_population_weights
@@ -29,22 +30,27 @@ def run_hill_climbing_lambda_experiments():
             # We use different seeds to test the stability of the algorithm
             np.random.seed(seed)
             start_time = time.time()
-            best_solution, best_cost = random_restart_hill_climbing(population_points,weights,candidate_hospitals,lambd=lambd,restart_times=2,max_iterations=100,selection_rate=0.15 )
+            result= random_restart_hill_climbing(population_points,weights,candidate_hospitals,lambd=lambd,restart_times=2,max_iterations=100,selection_rate=0.15 )
             end_time = time.time()
 
             #We record the important values for this run
-            costs.append(best_cost)
-            runtimes.append(end_time - start_time)
-            hospital_counts.append(np.sum(best_solution))
+            costs.append(result["total_cost"])            
+            runtimes.append(result["runtime_seconds"])    
+            hospital_counts.append(result["num_hospitals"]) 
 
             print("Run", seed + 1, "finished")
-            print("Cost =", best_cost)
-            print("Hospitals =", int(np.sum(best_solution)))
+            print("  Cost =", result["total_cost"])
+            print("  Hospitals =", result["num_hospitals"])
             print("Time =", round(end_time - start_time, 4), "seconds")
 
         # We summarize the results all runs
         results.append({"lambda": lambd,"average_cost": np.mean(costs),"cost_variance": np.var(costs),"average_runtime": np.mean(runtimes),"average_hospitals": np.mean(hospital_counts)})
-
+    
+    # save results to CSV
+    df = pd.DataFrame(results)
+    df.to_csv("hc_summary_results.csv", index=False)
+    print("Saved hc_summary_results.csv")
+    
     return results
 
 
@@ -73,22 +79,27 @@ def run_hill_climbing_parameter_tuning():
             np.random.seed(seed)
 
             start_time = time.time()
-            best_solution, best_cost = random_restart_hill_climbing(population_points,weights, candidate_hospitals,lambd=lambd,restart_times=2,max_iterations=100,selection_rate=selection_rate)
+            result= random_restart_hill_climbing(population_points,weights, candidate_hospitals,lambd=lambd,restart_times=2,max_iterations=100,selection_rate=selection_rate)
             end_time = time.time()
 
             # We record the important values for this run
-            costs.append(best_cost)
-            runtimes.append(end_time - start_time)
-            hospital_counts.append(np.sum(best_solution))
+            costs.append(result["total_cost"])            
+            runtimes.append(result["runtime_seconds"])    
+            hospital_counts.append(result["num_hospitals"]) 
 
             print("  Run", seed + 1, "finished")
-            print("  Cost =", best_cost)
-            print("  Hospitals =", int(np.sum(best_solution)))
+            print("  Cost =", result["total_cost"])
+            print("  Hospitals =", result["num_hospitals"])
             print("  Time =", round(end_time - start_time, 4), "seconds")
 
         # We summarize the results all runs
         tuning_results.append({"selection_rate": selection_rate,"average_cost": np.mean(costs),"cost_variance": np.var(costs),"average_runtime": np.mean(runtimes),"average_hospitals": np.mean(hospital_counts) })
 
+   #save tuning results to CSV
+    df = pd.DataFrame(tuning_results)
+    df.to_csv("hc_tuning_results.csv", index=False)
+    print("Saved hc_tuning_results.csv")
+    
     return tuning_results
 
 

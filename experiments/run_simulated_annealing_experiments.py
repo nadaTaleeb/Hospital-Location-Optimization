@@ -1,6 +1,7 @@
 import time
 import numpy as np
 import random
+import pandas as pd
 
 from algorithms.simulated_annealing import simulated_annealing
 from utils.data_generator import generate_population_points, generate_population_weights
@@ -28,16 +29,23 @@ def run_simulated_annealing_lambda_experiments():
             random.seed(seed)
 
             start_time = time.time()
-            best_solution, best_cost, _, _ = simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=0.95, selection_rate=0.15)
+            result= simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=0.95, selection_rate=0.15)
             end_time = time.time()
 
             #We record the important values for this run
-            costs.append(best_cost)
-            runtimes.append(end_time - start_time)
-            hospital_counts.append(np.sum(best_solution))
+            costs.append(result["total_cost"])           
+            runtimes.append(result["runtime_seconds"])   
+            hospital_counts.append(result["num_hospitals"])
 
         #We summarize the results all runs for this lambda
         results.append({"lambda": lambd,"average_cost": np.mean(costs),"cost_variance": np.var(costs),"average_runtime": np.mean(runtimes),"average_hospitals": np.mean(hospital_counts)})
+       
+    #save results to CSV so the plotting script can read it
+    df = pd.DataFrame(results)
+    df.to_csv("sa_summary_results.csv", index=False)
+    print("Saved sa_summary_results.csv")
+
+    
     return results
 
 
@@ -59,20 +67,20 @@ def run_simulated_annealing_parameter_tuning():
         hospital_counts = []
 
         for seed in range(number_of_runs):
-
-            np.random.seed(seed)
-            random.seed(seed)
-
             start_time = time.time()
-            best_solution, best_cost, _, _ = simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=alpha,selection_rate=0.15)
+            result = simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=alpha,selection_rate=0.15)
             end_time = time.time()
 
-            costs.append(best_cost)
-            runtimes.append(end_time - start_time)
-            hospital_counts.append(np.sum(best_solution))
+            costs.append(result["total_cost"])
+            runtimes.append(result["runtime_seconds"])
+            hospital_counts.append(result["num_hospitals"])
 
         #We summarize the results across all runs for this parameter
         tuning_results.append({"alpha": alpha,"average_cost": np.mean(costs),"cost_variance": np.var(costs),"average_runtime": np.mean(runtimes),"average_hospitals": np.mean(hospital_counts)})
+    df = pd.DataFrame(tuning_results)
+    df.to_csv("sa_tuning_results.csv", index=False)
+    print("Saved sa_tuning_results.csv")
+
     return tuning_results
 
 
