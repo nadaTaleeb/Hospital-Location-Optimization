@@ -50,3 +50,52 @@ plt.ylabel("Cost Variance")
 plt.grid(True)
 plt.savefig("sa_variance_vs_lambda.png")
 plt.show()
+
+# Hill Climbing plots
+summary = pd.read_csv("hc_summary_results.csv")
+
+lambda_values = summary["lambda"]
+mean_cost = summary["average_cost"]
+mean_runtime = summary["average_runtime"]
+mean_hospitals = summary["average_hospitals"]
+cost_variance = summary["cost_variance"]
+
+# Cost vs Lambda
+plt.figure()
+plt.plot(lambda_values, mean_cost, marker="o")
+plt.title("HC Mean Cost vs Lambda")
+plt.xlabel("Lambda")
+plt.ylabel("Mean Best Cost")
+plt.grid(True)
+plt.savefig("hc_cost_vs_lambda.png")
+plt.show()
+
+# Runtime vs Lambda
+plt.figure()
+plt.plot(lambda_values, mean_runtime, marker="o")
+plt.title("HC Mean Runtime vs Lambda")
+plt.xlabel("Lambda")
+plt.ylabel("Mean Runtime (seconds)")
+plt.grid(True)
+plt.savefig("hc_runtime_vs_lambda.png")
+plt.show()
+
+# Hospitals vs Lambda
+plt.figure()
+plt.plot(lambda_values, mean_hospitals, marker="o")
+plt.title("HC Selected Hospitals vs Lambda")
+plt.xlabel("Lambda")
+plt.ylabel("Mean Number of Selected Hospitals")
+plt.grid(True)
+plt.savefig("hc_hospitals_vs_lambda.png")
+plt.show()
+
+# Variance vs Lambda
+plt.figure()
+plt.plot(lambda_values, cost_variance, marker="o", color="orange")
+plt.title("HC Cost Variance vs Lambda")
+plt.xlabel("Lambda")
+plt.ylabel("Cost Variance")
+plt.grid(True)
+plt.savefig("hc_variance_vs_lambda.png")
+plt.show()

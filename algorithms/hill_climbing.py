@@ -1,6 +1,6 @@
 import numpy as np
 import time
-
+import random
 
 def validate_inputs(population_points, weights, candidate_hospitals, lambd):
 
@@ -65,8 +65,7 @@ def generate_initial_solution(num_candidates, selection_rate=0.15 , seed=None):
 
     return solution
 
-
-def generate_successors(solution, max_swaps=2, seed=None):
+def generate_successors(solution):
     if solution is None:
         raise ValueError("solution cannot be None.")
 
@@ -78,30 +77,13 @@ def generate_successors(solution, max_swaps=2, seed=None):
     if not np.all((solution == 0) | (solution == 1)):
         raise ValueError("solution must contain only 0 and 1.")
 
-    successors = []
+    # Create one random neighbor
+    new_solution = solution.copy()
+    index = random.randint(0, len(solution) - 1)
+    # Flip the selected bit
+    new_solution[index] = 1 - new_solution[index]
 
-    for i in range(len(solution)):
-        new_solution = solution.copy()
-        new_solution[i] = 1 - new_solution[i]
-        successors.append(new_solution)
-
-    # We remove one selected hospital and add one unselected hospital.
-    # This keeps the number of hospitals the same but changes their locations.
-    selected_indices = np.where(solution == 1)[0]
-    unselected_indices = np.where(solution == 0)[0]
-
-
-    if len(selected_indices) > 0 and len(unselected_indices) > 0:
-        for _ in range(max_swaps):
-            selected = np.random.choice(selected_indices)
-            unselected = np.random.choice(unselected_indices)
-
-            new_solution = solution.copy()
-            new_solution[selected] = 0
-            new_solution[unselected] = 1
-            successors.append(new_solution)
-            
-    return successors
+    return new_solution
 
 def random_restart_hill_climbing( population_points, weights, candidate_hospitals, lambd, restart_times=10, max_iterations=500, selection_rate=0.15 ,seed=None):
     population_points, weights, candidate_hospitals = validate_inputs( population_points, weights, candidate_hospitals, lambd)
@@ -127,23 +109,15 @@ def random_restart_hill_climbing( population_points, weights, candidate_hospital
 
         for iteration in range(max_iterations):
 
-            successors = generate_successors(current_solution)
-            total_viewed_states += len(successors)
+            successor = generate_successors(current_solution)
+            total_viewed_states += 1
+            successor_cost = calculate_cost(population_points,weights,candidate_hospitals,successor,lambd)
 
-            best_successor = current_solution.copy()
-            best_successor_cost = current_cost
-
-            for successor in successors:
-                successor_cost = calculate_cost(population_points,weights,candidate_hospitals,successor,lambd)
-                if successor_cost < best_successor_cost:
-                    best_successor = successor.copy()
-                    best_successor_cost = successor_cost
-
-            if best_successor_cost >= current_cost:
+            if successor_cost >= current_cost:
                 break
+            current_solution = successor.copy()
+            current_cost = successor_cost
 
-            current_solution = best_successor.copy()
-            current_cost = best_successor_cost
             total_expanded_states += 1
             cost_history.append(current_cost) # record cost at each improvement
         if current_cost < best_cost:

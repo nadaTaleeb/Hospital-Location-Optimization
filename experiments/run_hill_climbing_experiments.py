@@ -55,7 +55,7 @@ def run_hill_climbing_lambda_experiments():
 
 
 def run_hill_climbing_parameter_tuning():
-    selection_rates = [0.10, 0.15]  # We tune the initial selection rate parameter
+    selection_rates = [0.10, 0.15 , 0.20]  # We tune the initial selection rate parameter
     lambd = 10
     number_of_runs = 2
     tuning_results = []
@@ -98,8 +98,7 @@ def run_hill_climbing_parameter_tuning():
    #save tuning results to CSV
     df = pd.DataFrame(tuning_results)
     df.to_csv("hc_tuning_results.csv", index=False)
-    print("Saved hc_tuning_results.csv")
-    
+    print("Saved hc_tuning_results.csv") 
     return tuning_results
 
 

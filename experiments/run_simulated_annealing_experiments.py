@@ -28,9 +28,9 @@ def run_simulated_annealing_lambda_experiments():
             np.random.seed(seed)
             random.seed(seed)
 
-            start_time = time.time()
-            result= simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=0.95, selection_rate=0.15)
-            end_time = time.time()
+            
+            result= simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=0.95, selection_rate=0.15 ,seed=seed)
+
 
             #We record the important values for this run
             costs.append(result["total_cost"])           
@@ -68,7 +68,7 @@ def run_simulated_annealing_parameter_tuning():
 
         for seed in range(number_of_runs):
             start_time = time.time()
-            result = simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=alpha,selection_rate=0.15)
+            result = simulated_annealing(population_points,weights,candidate_hospitals,lambd=lambd,max_iterations=500,initial_temperature=1000,alpha=alpha,selection_rate=0.15 , seed=seed)
             end_time = time.time()
 
             costs.append(result["total_cost"])

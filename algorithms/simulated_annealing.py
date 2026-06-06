@@ -95,11 +95,12 @@ def simulated_annealing(population_points, weights, candidate_hospitals, lambd,m
     temperature_curve = []
 
     for iteration in range(max_iterations):
-        successors = generate_successors(current_solution) # Use the same successors used in Hill Climbing
+        # successors = generate_successors(current_solution) # Use the same successors used in Hill Climbing
 
-        if len(successors) == 0:
-            break
-        neighbor_solution = random.choice(successors) # Choose one successor randomly
+        # if len(successors) == 0:
+        #     break
+        # neighbor_solution = random.choice(successors) # Choose one successor randomly
+        neighbor_solution = generate_successors(current_solution)
 
         neighbor_cost = calculate_cost( population_points, weights, candidate_hospitals, neighbor_solution, lambd)
 
