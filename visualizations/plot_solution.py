@@ -38,5 +38,5 @@ if __name__ == "__main__":
     weights = generate_population_weights()
     candidate_hospitals = generate_candidate_hospitals()
     # Run Simulated Annealing
-    result = simulated_annealing(population_points,weights,candidate_hospitals,lambd=50,max_iterations=500,initial_temperature=1000,alpha=0.95,selection_rate=0.15,seed=42)
+    result = simulated_annealing(population_points,weights,candidate_hospitals,lambd=100,max_iterations=500,initial_temperature=1000,alpha=0.95,selection_rate=0.15,seed=42)
     plot_solution_map( population_points, candidate_hospitals, result["best_solution"], title="Simulated Annealing Solution Map")
